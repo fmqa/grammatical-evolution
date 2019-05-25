@@ -17,7 +17,7 @@ if __name__ == "__main__":
     # Problem representation; Use integers {0..3} as the source
     # sequence, as the binary operator rules has 4 possible
     # productions (add, sub, mul, div).
-    rep = codons(omega=range(4), most=100)
+    rep = codons(omega=range(4), most=100, weights=(0.2, 0.4, 0.4))
     
     # Example function.
     func = lambda x: x ** 4 + x ** 3 + x ** 2 + x
