@@ -168,9 +168,6 @@ class arithmetic(NamedTuple):
     S = exp
 
 if __name__ == "__main__":
-    import random
-    from typing import NamedTuple
-    
     add = "({} + {})".format
     sub = "({} - {})".format
     mul = "({} * {})".format
