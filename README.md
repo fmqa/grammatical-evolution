@@ -57,7 +57,7 @@ A basic genetic algorithm module is also included.
 	(x / (1 / (x * ((x + 1) * ((1 / x) + x)))))
 ```
 
-Expanding [1] the result yields `x⁴ + x³ + x² + x`, which is the original function. Typically, a solution is reached within 30-100 generations. Tuning the GA parameters may affect the performance.
+Expanding [the result][1] yields `x⁴ + x³ + x² + x`, which is the original function. Typically, a solution is reached within 30-100 generations. Tuning the GA parameters may affect the performance.
 
 ## Parallelization
 
