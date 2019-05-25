@@ -108,9 +108,7 @@ class ripple(NamedTuple):
         else:
             third = second[j:] + first[:i]
         # Truncate child suffix if maximum length exceeded.
-        if len(third) > most:
-            third = third[:most]
-        return third
+        return third[:most]
 
 class codons(NamedTuple):
     """Codon mutator/sampler."""
