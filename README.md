@@ -1,6 +1,6 @@
 # Minimal Implementation of Grammatical Evolution in Python
 
-This is a minimal, dependency-free module for *Grammatical Evolution* (Collins & O'Neill, 1998). I originally wrote this for use in a project involving automated evolution of a scikit-learn feature selection/transformation pipeline.
+This is a minimal, dependency-free module for [Grammatical Evolution](https://en.wikipedia.org/wiki/Grammatical_evolution) (Collins & O'Neill, 1998). I originally wrote this for use in a project involving automated evolution of a scikit-learn feature selection/transformation pipeline.
 
 Unlike traditional/classic GE which uses BNF, this module uses grammars specified using Python generators (See `picoga/grammatical.py` for an example).
 
