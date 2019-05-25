@@ -8,7 +8,7 @@ A basic genetic algorithm module is also included.
 
 ## Demonstration
 
-`symbolic-regression.py` demonstrates basic symbolic regression using randomly sampled points from `f(x)=x⁴ + x³ + x² + x`. Typically, the output looks like this:
+`symbolic-regression.py` demonstrates basic symbolic regression using randomly sampled points from *f(x)=x⁴ + x³ + x² + x*. Typically, the output looks like this:
 
 ```
 1: L=28, SCORE=98.14708157694972
@@ -57,7 +57,7 @@ A basic genetic algorithm module is also included.
 	(x / (1 / (x * ((x + 1) * ((1 / x) + x)))))
 ```
 
-Expanding [the result][1] yields `x⁴ + x³ + x² + x`, which is the original function. Typically, a solution is reached within 30-100 generations. Tuning the GA parameters may affect the performance.
+Expanding [the result][1] yields *x⁴ + x³ + x² + x*, which is the original function. Typically, a solution is reached within 30-100 generations. Tuning the GA parameters may affect the performance.
 
 ## Parallelization
 
