@@ -2,7 +2,6 @@
 
 __all__ = ["expand", "selector", "ripple", "codons"]
 
-from typing import NamedTuple, Sequence, Tuple, Any
 from functools import partial
 from collections import abc
 import random
@@ -83,60 +82,57 @@ class selector:
             self.n += 1
             return choices[x % len(choices)]
 
-class ripple(NamedTuple):
+class ripple:
     """One-point tail-exchange (ripple) crossover operator typically used in
     grammatical evolution."""
-    
-    most: int
-    random: Any = random
-    bias0: float = 0.5
-    bias1: float = 0.5
+    def __init__(self, most, bias0=0.5, bias1=0.5, random=random):
+        self.most = most
+        self.bias0 = bias0
+        self.bias1 = bias1
+        self.random = random
     
     def __call__(self, first, second):
-        most, random, bias0, bias1 = self
         # Vary prefix/suffix parents depending on bias.
-        if random.random() >= bias0:
+        if self.random.random() >= self.bias0:
             first, second = second, first
         # Cut-off point for first parent (prefix parent).
-        i = random.randrange(len(first))
+        i = self.random.randrange(len(first))
         # Cut-off point for second parent (suffix parent).
-        j = random.randrange(len(second))
+        j = self.random.randrange(len(second))
         # Construct child, varying prefix/suffix order depending
         # on bias.
-        if random.random() < bias1:
+        if self.random.random() < self.bias1:
             third = first[:i] + second[j:]
         else:
             third = second[j:] + first[:i]
         # Truncate child suffix if maximum length exceeded.
-        return third[:most]
+        return third[:self.most]
 
-class codons(NamedTuple):
+class codons:
     """Codon mutator/sampler."""
-    
-    omega: Sequence[int]
-    most: int
-    weights: Tuple[float, float, float] = (1.0, 1.0, 1.0)
-    random: Any = random
+    def __init__(self, omega, most, weights=(1.0, 1.0, 1.0), random=random):
+        self.omega = omega
+        self.most = most
+        self.weights = weights
+        self.random = random
     
     def samples(self, n):
         """Returns N random codon sequences."""
-        omega, most, weights, random = self
         while n >= 0:
-            yield tuple(random.choices(omega, k=random.randint(1, most)))
+            yield tuple(self.random.choices(self.omega, k=self.random.randint(1, self.most)))
             n -= 1
 
     def __call__(self, member):
-        omega, most, weights, random = self
         # Select random action: (c)lone, (d)elete, or (r)eplace.
-        [action] = random.choices("cdr", weights)
+        [action] = self.random.choices("cdr", self.weights)
         # Index to perform the action on.
-        index = random.randrange(len(member))
+        index = self.random.randrange(len(member))
         # Convert to list to allow for mutation.
         member = list(member)
         # Clone random element and add it to the suffix unless the
         # length bound is reached, in case we perform a removal instead.
         if action == "c":
-            if len(member) < most:
+            if len(member) < self.most:
                 member.append(member[index])
             else:
                 action = "d"
@@ -149,13 +145,14 @@ class codons(NamedTuple):
                 action = "r"
         # Replace random element with its nearest neighbor.
         if action == "r":
-            member[index] = omega[(omega.index(member[index]) + 1) % len(omega)]
+            member[index] = self.omega[(self.omega.index(member[index]) + 1) % len(self.omega)]
         return tuple(member)
 
-class arithmetic(NamedTuple):
+class arithmetic:
     """Simple grammar for infix arithmetic with binary operators.""" 
-    vars: abc.Sequence
-    binops: abc.Sequence
+    def __init__(self, vars, binops):
+        self.vars = vars
+        self.binops = binops
     def var(self):
         return (yield self.vars)
     def binary(self):

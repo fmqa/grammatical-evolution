@@ -4,22 +4,21 @@ __all__ = ["tournament", "reassemble2p", "twopoint", "uniform", "evolve"]
 
 import random
 from itertools import chain
-from typing import NamedTuple, Callable, Sequence, Any
 from collections import OrderedDict
 
-class tournament(NamedTuple):
+class tournament:
     """Deterministic tournament selection strategy."""
-    # Default to binary tournament.
-    k: int = 2
+    
+    def __init__(self, k=2):
+        self.k = k
+    
     def __call__(self, population, fitness, elite, random=random):
-        # Tournament size
-        [k] = self
         # Save the elites (Lowest N elements).
         result = population[:elite]
         # Non-elite population size.
         n = len(population) - elite
         # Extend result list by stochastically selected elements.
-        result += (min(random.choices(population, k=k), key=fitness) for index in range(n))
+        result += (min(random.choices(population, k=self.k), key=fitness) for index in range(n))
         # Return new population.
         return result
 
@@ -27,33 +26,34 @@ def reassemble2p(prefix, old, new, suffix):
     """Two-point crossover reassembly operator."""
     return prefix + new + suffix
 
-class twopoint(NamedTuple):
+class twopoint:
     """Two-point crossover of two members. Returns the offspring of first and second."""
-    reassemble: Callable[[Sequence, Sequence, Sequence, Sequence], Sequence] = reassemble2p
-    random: Any = random
-
+    def __init__(self, reassemble=reassemble2p, random=random):
+        self.reassemble = reassemble
+        self.random = random
+    
     def __call__(self, first, second):
         if first and second:
-            reassemble, random = self
-            k = random.randint(1, min(len(first), len(second)))
-            a = random.randint(0, len(first) - k)
-            b = random.randint(0, len(second) - k)
-            third = reassemble(first[:a], first[a:a+k], second[b:b+k], first[a+k:])
+            k = self.random.randint(1, min(len(first), len(second)))
+            a = self.random.randint(0, len(first) - k)
+            b = self.random.randint(0, len(second) - k)
+            third = self.reassemble(first[:a], first[a:a+k], second[b:b+k], first[a+k:])
             return third
         else:
             return first or second
 
-class uniform(NamedTuple):
+class uniform:
     """Uniform crossover of two members."""
-    type: Callable[[Any], Any] = tuple
-    bias: float = 0.5
-    random: Any = random
+    def __init__(self, type=tuple, bias=0.5, random=random):
+        self.type = type
+        self.bias = bias
+        self.random = random
+    
     def __call__(self, first, second):
         if first and second:
-            type, bias, random = self
             k = min(len(first), len(second))
-            a = random.randint(0, len(first) - k)
-            child = type(a if random.random() < bias else b for a, b in zip(first, chain(chain(first[:a], second), first[a+k:])))
+            a = self.random.randint(0, len(first) - k)
+            child = self.type(a if self.random.random() < self.bias else b for a, b in zip(first, chain(chain(first[:a], second), first[a+k:])))
             return child
         else:
             return first or second

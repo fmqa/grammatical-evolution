@@ -3,15 +3,14 @@
 __all__ = ["integers", "grid", "subset", "composite"]
 
 import random
-from typing import NamedTuple, Iterable, Sequence, OrderedDict, Callable, Any
 import math
 
-class grid(NamedTuple):
+class grid:
     """Mutator/Sampler for a parameter grid."""
-    
-    space: OrderedDict[Any, Callable[[Any], Any]]
-    rate: float
-    random: Any = random
+    def __init__(self, space, rate, random=random):
+        self.space = space
+        self.rate = rate
+        self.random = random
     
     @classmethod
     def auto(cls, space, random=random):
@@ -19,23 +18,22 @@ class grid(NamedTuple):
     
     def samples(self, n):
         """Yields n random samples."""
-        space, rate, random = self
         while n > 0:
-            yield frozenset((k, v(random)) for k, v in space.items())
+            yield frozenset((k, v(self.random)) for k, v in self.space.items())
             n -= 1
     
     def __call__(self, member):
         """Mutates a single parameter within the grid."""
-        space, rate, random = self
-        return frozenset((k, space[k](random) if random.random() < rate else v) for k, v in member)
+        return frozenset((k, self.space[k](self.random) if self.random.random() < self.rate else v) for k, v in member)
 
-class subset(NamedTuple):
+class subset:
     """Mutator/Sampler for algebraic sets."""
 
-    omega: Sequence
-    least: int
-    rate: float = 0.5
-    random: Any = random
+    def __init__(self, omega, least, rate=0.5, random=random):
+        self.omega = omega
+        self.least = least
+        self.rate = rate
+        self.random = random
     
     @classmethod
     def auto(cls, omega, least=1, rate=0.5, random=random): 
@@ -43,45 +41,41 @@ class subset(NamedTuple):
     
     def samples(self, n):
         """Yields n random samples."""
-        omega, least, rate, random = self
         while n > 0:
-            yield frozenset(random.sample(omega, random.randint(least, len(omega))))
+            yield frozenset(self.random.sample(self.omega, self.random.randint(self.least, len(self.omega))))
             n -= 1
     
     def mutate(self, member):
         """Mutation operator that removes or adds an element to the operand."""
-        omega, least, rate, random = self
         member = set(member)
         # Mutate
-        if random.random() < rate:
+        if self.random.random() < self.rate:
             member.pop()
         else:
-            member.add(random.choice(omega))
+            member.add(self.random.choice(self.omega))
         # Ensure invariants
-        if len(member) < least:
-            member.update(random.sample(omega, least - len(member)))
+        if len(member) < self.least:
+            member.update(self.random.sample(self.omega, self.least - len(member)))
         return frozenset(member)
     
     def ucrossover(self, first, second):
         """Crossover that returns the set union of the operands."""
-        omega, least, rate, random = self
         return frozenset(first | second)
     
     def uncrossover(self, first, second):
         """Crossover that returns the intersection or union of the operands."""
-        omega, least, rate, random = self
-        result = first | second if random.random() < 0.5 else first & second
+        result = first | second if self.random.random() < 0.5 else first & second
         # Ensure invariants
-        if len(result) < least:
+        if len(result) < self.least:
             result = set(result)
-            result.update(random.sample(omega, least - len(result)))
+            result.update(self.random.sample(self.omega, self.least - len(result)))
         return frozenset(result)
 
-class composite(NamedTuple):
+class composite:
     """Helper for composite chromosomes."""
-     
-    mutators: Iterable[Any]
-    crossovers: Iterable[Any]
+    def __init__(self, mutators, crossovers):
+        self.mutators = mutators
+        self.crossovers = crossovers
     
     def samples(self, n):
         return zip(*(x.samples(n) for x in self.mutators))
