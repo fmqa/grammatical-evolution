@@ -2,7 +2,6 @@
 
 __all__ = ["expand", "selector", "ripple", "codons"]
 
-from functools import partial
 from collections import abc
 import random
 import math
