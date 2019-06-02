@@ -84,23 +84,19 @@ class selector:
 class ripple:
     """One-point tail-exchange (ripple) crossover operator typically used in
     grammatical evolution."""
-    def __init__(self, most, bias0=0.5, bias1=0.5, random=random):
+    def __init__(self, most, bias=0.5, random=random):
         self.most = most
-        self.bias0 = bias0
-        self.bias1 = bias1
+        self.bias = bias
         self.random = random
     
     def __call__(self, first, second):
-        # Vary prefix/suffix parents depending on bias.
-        if self.random.random() >= self.bias0:
-            first, second = second, first
         # Cut-off point for first parent (prefix parent).
         i = self.random.randrange(len(first))
         # Cut-off point for second parent (suffix parent).
         j = self.random.randrange(len(second))
         # Construct child, varying prefix/suffix order depending
         # on bias.
-        if self.random.random() < self.bias1:
+        if self.random.random() < self.bias:
             third = first[:i] + second[j:]
         else:
             third = second[j:] + first[:i]
